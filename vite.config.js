@@ -1,25 +1,23 @@
 import { defineConfig } from 'vite'
+import restart from 'vite-plugin-restart'
 
 const PORT = 5173
 
-export default defineConfig({
-  server: {
-    cors: true,
-    hmr: true,
-    port: PORT,
-    strictPort: true,
-  },
-  build: {
-    outDir: 'dist',
-    rollupOptions: {
-      input: 'src/main.js',
-      output: {
-        format: 'es',
-        entryFileNames: 'main.js',
-        manualChunks: undefined
-      }
+export default {
+    root: 'src/', // Sources files (typically where index.html is)
+    publicDir: '../static/', // Path from "root" to static assets (files that are served as they are)
+    server: {
+        host: true, // Open to local network and display URL
+        open: !('SANDBOX_URL' in process.env || 'CODESANDBOX_HOST' in process.env), // Open if it's not a CodeSandbox
+        port: PORT, 
+        cors: true, 
     },
-    minify: true,
-    sourcemap: true
-  }
-})
+    build: {
+        outDir: '../dist', // Output in the dist/ folder
+        emptyOutDir: true, // Empty the folder first
+        sourcemap: true // Add sourcemap
+    },
+    plugins: [
+        restart({ restart: ['../static/**',] }) // Restart server on static file change
+    ],
+}
